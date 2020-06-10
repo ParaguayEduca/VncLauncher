@@ -29,7 +29,7 @@ import dbus
 
 from sugar3.activity import activity
 from sugar3 import env
-import ConfigParser
+import configparser 
 import os.path
 import platform
 from jarabe.model import network
@@ -175,7 +175,7 @@ class VTE(Vte.Terminal):
                 None)
 
     def _configure_vte(self):
-        conf = ConfigParser.ConfigParser()
+        conf = configparser.ConfigParser()
         conf_file = os.path.join(env.get_profile_path(), 'terminalrc')
 
         if os.path.isfile(conf_file):
@@ -202,9 +202,11 @@ class VTE(Vte.Terminal):
         else:
             bg_color = '#FFFFFF'
             conf.set('terminal', 'bg_color', bg_color)
-        self.set_colors(Gdk.color_parse(fg_color),
-                        Gdk.color_parse(bg_color),
-                        [])
+
+        try:
+            self.set_colors(Gdk.color_parse(fg_color),Gdk.color_parse(bg_color),[])
+        except TypeError:
+            self.set_colors(Gdk.RGBA(*Gdk.color_parse(fg_color).to_floats()),Gdk.RGBA(*Gdk.color_parse(bg_color).to_floats()),[] )
 
         if conf.has_option('terminal', 'cursor_blink'):
             blink = conf.getboolean('terminal', 'cursor_blink')
@@ -249,7 +251,7 @@ class VTE(Vte.Terminal):
         else:
             emulation = 'xterm'
             conf.set('terminal', 'emulation', emulation)
-        self.set_emulation(emulation)
+  #     self.set_emulation(emulation)
 
         if conf.has_option('terminal', 'visible_bell'):
             visible_bell = conf.getboolean('terminal', 'visible_bell')
